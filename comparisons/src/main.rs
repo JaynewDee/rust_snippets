@@ -24,5 +24,5 @@ fn main() {
     println!("0x80 >> 2 is 0x{:x}", 0x80u32 >> 2);
 
     // Use underscores to improve readability:
-    println!("One mission can be written as {}", 1_000_000u32);
+    println!("One million can be written as {}", 1_000_000u32);
 }
