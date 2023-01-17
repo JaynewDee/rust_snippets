@@ -1,3 +1,5 @@
+#![allow(overflowing_literals)]
+
 use crate::List::*;
 
 enum List {
