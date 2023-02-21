@@ -3,22 +3,22 @@ fn main() {
 }
 
 fn tuple() {
-    let pair = ('@pple', 13);
+    let pair = ("@pple", 13);
     pair.0; // '@apple'
     pair.1; // 13
 
     // With explicit type annotation
-    let pair: (String, i32) = ('@pple', 13);
+    let pair: (String, i32) = ("@pple", 13);
 
     // Destructure during assignment
-    let (word, number) = ('glaive', 99);
-    assert!(word, 'glaive');
+    let (word, number) = ("glaive", 99);
+    assert!(word, "glaive");
     assert!(number, 17);
 }
 
 // Declare a block to create a scope
 // Blocks are expressions, meaning they evaluate to a value
-{
+fn pupil() {
     // This:
     let x = 42;
     // is equivalent to this:
@@ -30,10 +30,10 @@ fn tuple() {
     // The tail determines what the black will evaluate to
 }
 // These functions are equivalent:
-fn get_number() -> {
+fn get_number() -> u8 {
     return 55;
 }
-fn same_thing() -> {
+fn same_thing() -> u8 {
     55
 }
 
