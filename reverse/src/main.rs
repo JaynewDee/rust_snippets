@@ -1,11 +1,20 @@
+use std::env::args;
+
 fn main() {
-    // As one-liner ?
+    let input: Vec<String> = args().collect();
 
-    let reversed = reverse("Hello, world!");
+    //
 
-    println!("{}", reversed);
-
-    // NICE
+    if input.len() > 2 {
+        panic!("Too many args !!!");
+    }
+    if input.len() == 2 {
+        println!("{:?}", reverse(&input[1]));
+        return;
+    } else {
+        println!("{}", reverse("Hello, world!"));
+        return;
+    }
 }
 
 fn reverse(input_str: &str) -> String {
