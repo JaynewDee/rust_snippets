@@ -173,12 +173,19 @@ pub mod http_server {
 ////////////////////
 // Actix HTTP
 pub mod swerver_framework {
-    use super::framework_socket;
+    use super::framework_socket::WebSocket;
     use actix_files::NamedFile;
-    use actix_web::{middleware, web, App, Error, HttpServer, Responder};
+    use actix_web::{
+        middleware, web, App, Error, HttpRequest, HttpResponse, HttpServer, Responder,
+    };
+    use actix_web_actors::ws;
 
     async fn index() -> impl Responder {
         NamedFile::open_async("./statics/index.html").await.unwrap()
+    }
+
+    async fn websocket(req: HttpRequest, stream: web::Payload) -> Result<HttpResponse, Error> {
+        ws::start(WebSocket::new(), &req, stream)
     }
 
     #[actix_web::main]
@@ -217,11 +224,11 @@ pub mod framework_socket {
     const HEARTBEAT_INTERVAL: Duration = Duration::from_secs(5);
     const CLIENT_TIMEOUT: Duration = Duration::from_secs(10);
 
-    pub struct MyWebSocket {
+    pub struct WebSocket {
         hb: Instant,
     }
 
-    impl MyWebSocket {
+    impl WebSocket {
         pub fn new() -> Self {
             Self { hb: Instant::now() }
         }
@@ -229,7 +236,7 @@ pub mod framework_socket {
         // This function will run on an interval, every 5 seconds to check
         // that the connection is still alive. If it's been more than
         // 10 seconds since the last ping, we'll close the connection.
-        fn hb(&self, ctx: &mut <Self as Actor>::Context) {
+        fn heartbeat(&self, ctx: &mut <Self as Actor>::Context) {
             ctx.run_interval(HEARTBEAT_INTERVAL, |act, ctx| {
                 if Instant::now().duration_since(act.hb) > CLIENT_TIMEOUT {
                     ctx.stop();
@@ -241,21 +248,17 @@ pub mod framework_socket {
         }
     }
 
-    impl Actor for MyWebSocket {
+    impl Actor for WebSocket {
         type Context = ws::WebsocketContext<Self>;
 
         // Start the heartbeat process for this connection
         fn started(&mut self, ctx: &mut Self::Context) {
-            self.hb(ctx);
+            self.heartbeat(ctx);
         }
     }
 
     // The `StreamHandler` trait is used to handle the messages that are sent over the socket.
-    impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for MyWebSocket {
-        // The `handle()` function is where we'll determine the response
-        // to the client's messages. So, for example, if we ping the client,
-        // it should respond with a pong. These two messages are necessary
-        // for the `hb()` function to maintain the connection status.
+    impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
         fn handle(&mut self, msg: Result<ws::Message, ws::ProtocolError>, ctx: &mut Self::Context) {
             match msg {
                 // Ping/Pong will be used to make sure the connection is still alive
