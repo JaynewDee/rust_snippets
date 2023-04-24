@@ -1,3 +1,6 @@
+use rand::seq::SliceRandom;
+use rand::thread_rng;
+
 trait SortStrategy<T> {
     fn sort(&self, data: &mut [T]);
 }
@@ -61,13 +64,16 @@ impl<T> Sorter<T> {
 }
 
 fn main() {
-    let data = &mut [3, 2, 1, 4, 5];
+    let mut array: [usize; 50] = core::array::from_fn(|i| i * 5);
+    array.shuffle(&mut thread_rng());
+    println!("{:?}", array);
+
     let bubble_sort = Box::new(BubbleSort);
     let quick_sort = Box::new(QuickSort);
     let sorter = Sorter::new(bubble_sort);
-    sorter.sort(data);
-    println!("{:?}", data);
+    sorter.sort(&mut array);
+    println!("{:?}", array);
     let sorter = Sorter::new(quick_sort);
-    sorter.sort(data);
-    println!("{:?}", data);
+    sorter.sort(&mut array);
+    println!("{:?}", array);
 }

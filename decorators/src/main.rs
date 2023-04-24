@@ -1,6 +1,9 @@
 use std::time::{Duration, Instant};
 
-fn timer<F, T>(mut f: F) -> impl FnMut(T) -> T {
+fn timer<F, T>(mut f: F) -> impl FnMut(T) -> T
+where
+    F: FnMut(T) -> T,
+{
     move |args| {
         let start = Instant::now();
         f(args);
@@ -19,6 +22,7 @@ fn cpu_spinner(x: i32) {
         sum += nums[j];
     }
 }
+
 fn main() {
     println!("Hello, world!");
 }
